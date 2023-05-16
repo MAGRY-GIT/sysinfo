@@ -480,19 +480,22 @@ impl SystemExt for System {
             "CurrentBuildNumber",
         )
         .unwrap_or_default();
-        let major = if self.is_windows_eleven() {
-            11u32
-        } else {
-            u32::from_le_bytes(
-                get_reg_value_u32(
-                    HKEY_LOCAL_MACHINE,
-                    "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
-                    "CurrentMajorVersionNumber",
-                )
-                .unwrap_or_default(),
+        let major = u32::from_le_bytes(
+            get_reg_value_u32(
+                HKEY_LOCAL_MACHINE,
+                "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
+                "CurrentMajorVersionNumber",
+            ).unwrap_or_default(),
+        );
+        let minor = u32::from_le_bytes(
+            get_reg_value_u32(
+                HKEY_LOCAL_MACHINE,
+                "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
+                "CurrentMinorVersionNumber",
             )
-        };
-        Some(format!("{major} ({build_number})"))
+            .unwrap_or_default(),
+        );
+        Some(format!("{major}.{minor}.{build_number}"))
     }
 
     fn distribution_id(&self) -> String {
